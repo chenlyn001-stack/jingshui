@@ -1,0 +1,132 @@
+[
+  {
+    "id": "gov-zwgk",
+    "name": "国务院文件",
+    "kind": "gov_api",
+    "cat": "policy",
+    "weight": 100,
+    "hours": 240,
+    "max_items": 30,
+    "url": "https://sousuo.www.gov.cn/search-gov/data?t=zhengcelibrary_gw&q=&timetype=timeqb&sort=pubtime&sortType=1&searchfield=title&p=1&n=30&type=gwyzcwjk"
+  },
+  {
+    "id": "gov-bm",
+    "name": "部委文件",
+    "kind": "gov_api",
+    "cat": "policy",
+    "weight": 96,
+    "hours": 240,
+    "max_items": 30,
+    "url": "https://sousuo.www.gov.cn/search-gov/data?t=zhengcelibrary_bm&q=&timetype=timeqb&sort=pubtime&sortType=1&searchfield=title&p=1&n=30&type=bmgwzcwjk"
+  },
+  {
+    "id": "ndrc-news",
+    "name": "国家发展改革委",
+    "kind": "html_list",
+    "cat": "policy",
+    "weight": 92,
+    "hours": 120,
+    "url": "https://www.ndrc.gov.cn/xwdt/xwfb/",
+    "base": "https://www.ndrc.gov.cn/xwdt/xwfb/",
+    "link_pattern": "\\./(\\d{6})/t(\\d{8})_\\d+\\.html"
+  },
+  {
+    "id": "jiemian",
+    "name": "界面新闻",
+    "kind": "rss",
+    "cat": "policy",
+    "weight": 76,
+    "url": "https://a.jiemian.com/index.php?m=article&a=rss"
+  },
+  {
+    "id": "chinanews-top",
+    "name": "中新网·要闻",
+    "kind": "rss",
+    "cat": "policy",
+    "weight": 70,
+    "url": "https://www.chinanews.com.cn/rss/scroll-news.xml",
+    "referer": "https://www.chinanews.com.cn/"
+  },
+  {
+    "id": "chinanews-cn",
+    "name": "中新网·国内",
+    "kind": "rss",
+    "cat": "policy",
+    "weight": 64,
+    "url": "https://www.chinanews.com.cn/rss/china.xml",
+    "referer": "https://www.chinanews.com.cn/"
+  },
+  {
+    "id": "wallstreetcn",
+    "name": "华尔街见闻",
+    "kind": "rss",
+    "cat": "fin",
+    "weight": 74,
+    "url": "https://dedicated.wallstreetcn.com/rss.xml"
+  },
+  {
+    "id": "chinanews-fin",
+    "name": "中新网·财经",
+    "kind": "rss",
+    "cat": "fin",
+    "weight": 68,
+    "url": "https://www.chinanews.com.cn/rss/finance.xml",
+    "referer": "https://www.chinanews.com.cn/"
+  },
+  {
+    "id": "tmtpost",
+    "name": "钛媒体",
+    "kind": "rss",
+    "cat": "tech",
+    "weight": 58,
+    "url": "https://www.tmtpost.com/rss.xml"
+  },
+  {
+    "id": "infoq",
+    "name": "InfoQ 中文",
+    "kind": "rss",
+    "cat": "tech",
+    "weight": 56,
+    "url": "https://www.infoq.cn/feed"
+  },
+  {
+    "id": "geekpark",
+    "name": "极客公园",
+    "kind": "rss",
+    "cat": "tech",
+    "weight": 54,
+    "url": "https://www.geekpark.net/rss"
+  },
+  {
+    "id": "ifanr",
+    "name": "爱范儿",
+    "kind": "rss",
+    "cat": "tech",
+    "weight": 50,
+    "url": "https://www.ifanr.com/feed"
+  },
+  {
+    "id": "solidot",
+    "name": "Solidot",
+    "kind": "rss",
+    "cat": "tech",
+    "weight": 44,
+    "url": "https://www.solidot.org/index.rss"
+  },
+  {
+    "id": "sspai",
+    "name": "少数派",
+    "kind": "rss",
+    "cat": "life",
+    "weight": 42,
+    "url": "https://sspai.com/feed"
+  },
+  {
+    "id": "ruanyf",
+    "name": "阮一峰的网络日志",
+    "kind": "rss",
+    "cat": "life",
+    "weight": 38,
+    "url": "https://www.ruanyifeng.com/blog/atom.xml"
+  }
+]

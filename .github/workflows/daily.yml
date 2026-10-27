@@ -1,0 +1,72 @@
+name: 静水 · 每日简报
+
+on:
+  schedule:
+    # GitHub 的定时器走 UTC，下面 +8 小时即北京时间
+    # 06:30 / 12:30 / 20:30 北京时间各跑一次
+    - cron: "30 22 * * *"   # 06:30 CST
+    - cron: "30 4 * * *"    # 12:30 CST
+    - cron: "30 12 * * *"   # 20:30 CST
+  workflow_dispatch:        # 支持在网页上手动点一下立即运行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 生成今日简报
+        env:
+          ZP_KEY: ${{ secrets.ZP_KEY }}
+          ZP_MODEL: glm-4-flash
+          PYTHONIOENCODING: utf-8
+        run: python run.py
+
+      - name: 归档当日版本
+        run: |
+          mkdir -p archive
+          STAMP=$(date -u -d '+8 hour' +'%Y-%m-%d-%H%M')
+          cp output/latest.json "archive/${STAMP}.json" || true
+          # 只保留最近 40 期，防止仓库无限膨胀
+          ls -1t archive/*.json 2>/dev/null | tail -n +41 | xargs -r rm -f
+
+      - name: 生成网站入口
+        run: |
+          # GitHub Pages 只认根目录的 index.html，把简报复制过去
+          cp output/briefing.html index.html
+          # 关掉 Jekyll 构建，省 30 秒也避免它改写文件
+          touch .nojekyll
+
+      - name: 提交结果
+        run: |
+          git config user.name  "jingshui-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A output/ archive/ index.html .nojekyll
+          if git diff --staged --quiet; then
+            echo "内容无变化，跳过提交"
+          else
+            git commit -m "brief: $(date -u -d '+8 hour' +'%Y-%m-%d %H:%M') 简报"
+            git push
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: briefing
+          path: output/
+          retention-days: 14

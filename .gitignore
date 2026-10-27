@@ -1,0 +1,25 @@
+# ---- 密钥与本地环境（绝对不能进仓库）----
+.env
+*.key
+.venv/
+venv/
+
+# ---- 本地构建产物与草稿 ----
+build/
+!build/.gitkeep
+prototype/
+静水-产品方案-v0.1.md
+output/*.tmp
+
+# ---- 本地笔记/上下文（绝不外传）----
+.workbuddy/
+
+# ---- 系统与编辑器 ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]

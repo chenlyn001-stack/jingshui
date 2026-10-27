@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>静水 · 2026年10月27日 今日简报</title>
+<style>
+  :root{
+    --paper:#F6F5F1; --surface:#FFFFFF; --line:#E4E1D8; --line-soft:#EFEDE6;
+    --ink:#15161A; --ink-2:#3C3F46; --muted:#7C7972; --muted-2:#A09C93;
+    --navy:#1C3557; --red:#A62F26; --gold:#B08334;
+    --serif:"Noto Serif SC","Source Han Serif SC","Songti SC",serif;
+    --sans:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; line-height:1.7;
+    padding:0 0 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+
+  header{padding:34px 20px 20px; max-width:760px; margin:0 auto}
+  .brand{font-family:var(--serif); font-size:13px; letter-spacing:5px; color:var(--navy); opacity:.85}
+  .date-row{display:flex; align-items:baseline; gap:12px; margin:18px 0 12px}
+  .date-row h1{font-family:var(--serif); font-size:30px; font-weight:600; letter-spacing:1px}
+  .date-row .wd{font-size:12px; color:var(--muted-2); letter-spacing:1px}
+  .headline{
+    font-family:var(--serif); font-size:19px; line-height:1.75; color:var(--ink-2);
+    padding:16px 18px; background:linear-gradient(180deg,#FFFDF6,#FBF8EE);
+    border:1px solid #EDE7D6; border-radius:12px; margin-bottom:14px;
+  }
+  .themes{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+  .themes span{font-size:11px; padding:3px 10px; border:1px solid var(--line); border-radius:20px; color:var(--muted)}
+  .watch{font-size:12.5px; color:var(--muted); line-height:1.9; padding-left:12px; border-left:2px solid var(--gold)}
+
+  .filters{display:flex; gap:8px; padding:18px 20px 12px; max-width:760px; margin:0 auto; overflow-x:auto; scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{
+    flex:0 0 auto; padding:6px 15px; border-radius:20px; border:1px solid var(--line);
+    background:var(--surface); font-size:12.5px; color:var(--ink-2); cursor:pointer;
+    font-family:var(--sans); transition:.2s;
+  }
+  .filters button.on{background:var(--navy); border-color:var(--navy); color:#fff}
+
+  .item{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    margin-bottom:12px; overflow:hidden; transition:.2s;
+  }
+  .item[open]{box-shadow:0 6px 24px -12px rgba(28,35,55,.18)}
+  .item summary{list-style:none; padding:17px 18px 15px; cursor:pointer; position:relative}
+  .item summary::-webkit-details-marker{display:none}
+  .r1{display:flex; align-items:center; gap:7px; margin-bottom:9px}
+  .cat{font-size:9.5px; padding:2px 7px; border-radius:4px; letter-spacing:.5px}
+  .c-policy{background:#EDF1F7;color:#2A4A72}
+  .c-fin{background:#FBF1E8;color:#8A5A21}
+  .c-tech{background:#EDF4F0;color:#2C6349}
+  .c-life{background:#F4EFF6;color:#6A4A72}
+  .hot{font-size:9.5px;color:var(--red)}
+  .hot::before{content:"●"; margin-right:3px; font-size:6px; vertical-align:2px}
+  .score{margin-left:auto; font-size:11px; color:var(--muted-2); font-variant-numeric:tabular-nums; letter-spacing:.5px}
+  .item h2{
+    font-family:var(--serif); font-size:17.5px; line-height:1.6; font-weight:600; letter-spacing:.2px;
+    display:flex; gap:9px; align-items:baseline;
+  }
+  .item h2 .no{
+    font-family:var(--sans); font-size:11px; color:var(--muted-2); font-weight:400;
+    flex:0 0 auto; padding-top:2px; font-variant-numeric:tabular-nums;
+  }
+  .lead{font-size:13px; color:var(--muted); line-height:1.85; margin:9px 0 10px; padding-left:26px}
+  .meta{font-size:10.5px; color:var(--muted-2); display:flex; gap:10px; flex-wrap:wrap; padding-left:26px; align-items:center}
+  .meta em{font-style:normal; color:var(--navy); opacity:.8}
+  .dno{color:var(--gold); border:1px solid #EDE2C9; background:#FDFAF2; padding:0 5px; border-radius:3px}
+  .expand{position:absolute; right:18px; bottom:15px; font-size:10.5px; color:var(--muted-2)}
+  .item[open] .expand{display:none}
+
+  .body{padding:0 18px 18px; border-top:1px solid var(--line-soft); margin-top:2px}
+  .digest{background:linear-gradient(180deg,#FCFBF7,#F8F6EF); border:1px solid #EDE9DC; border-radius:10px; padding:14px 15px; margin:15px 0 0}
+  .dh{font-size:10px; letter-spacing:2px; color:var(--gold); margin-bottom:9px}
+  .digest ul{list-style:none}
+  .digest li{font-size:13.5px; line-height:1.95; color:var(--ink-2); padding-left:14px; position:relative; margin-bottom:6px}
+  .digest li::before{content:""; position:absolute; left:2px; top:12px; width:4px; height:4px; background:var(--gold); border-radius:50%; opacity:.8}
+  .digest li:last-child{margin-bottom:0}
+  .facts{margin-top:12px; padding:12px 15px; border:1px dashed var(--line); border-radius:10px}
+  .fh{font-size:10px; letter-spacing:2px; color:var(--muted-2); margin-bottom:7px}
+  .facts ul{list-style:none}
+  .facts li{font-size:12.5px; line-height:1.9; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .facts li::before{content:"·"; margin-right:7px; color:var(--gold)}
+  .sec{font-size:10px; letter-spacing:2px; color:var(--muted-2); margin:18px 0 9px; display:flex; align-items:center; gap:8px}
+  .sec::after{content:""; flex:1; height:1px; background:var(--line-soft)}
+  .cmps{display:grid; grid-template-columns:1fr; gap:8px}
+  @media(min-width:560px){ .cmps{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))} }
+  .cmp{background:var(--paper); border:1px solid var(--line); border-radius:9px; padding:10px 12px}
+  .cn{font-size:11.5px; color:var(--navy); font-weight:600; margin-bottom:5px}
+  .ct{font-size:12px; line-height:1.8; color:var(--ink-2)}
+  .gap{font-size:12px; color:var(--muted); line-height:1.85; margin-top:9px; padding-left:11px; border-left:2px solid var(--line)}
+  .srcs{font-size:11px; color:var(--muted-2); margin-top:12px}
+  .gap-note{font-size:11.5px; color:var(--muted-2); margin-top:10px; padding:7px 11px; background:#FBFAF6; border-left:2px solid var(--line); border-radius:0 6px 6px 0}
+  .atts{font-size:11.5px; color:var(--muted-2); margin-top:12px}
+  .atts a{color:var(--navy); text-decoration:none; border-bottom:1px dotted #BFC9D8; margin-right:10px; opacity:.85}
+  .origin{display:inline-block; margin-top:14px; font-size:12px; color:var(--navy); text-decoration:none; border-bottom:1px solid #C9D2DF}
+
+  footer{max-width:760px; margin:26px auto 0; padding:18px 20px 0; border-top:1px solid var(--line); font-size:11px; color:var(--muted-2); line-height:2}
+  footer b{color:var(--ink-2); font-weight:500}
+  .empty{text-align:center; padding:60px 20px; color:var(--muted-2); font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">静 水 · 今 日 简 报</div>
+  <div class="date-row"><h1>2026年10月27日</h1><span class="wd">周二</span></div>
+  <div class="headline">政策导向与产业升级并行，经济活力持续增强。</div>
+  <div class="themes"><span>政策导向</span><span>产业升级</span><span>经济活力</span></div>
+  <div class="watch">关注《加快构建工业和信息化领域碳排放双控工作体系实施方案》，把握绿色转型新动向。</div>
+</header>
+
+<div class="filters">
+  <button class="on" data-f="all">全部 18</button>
+  <button data-f="policy">时政 11</button><button data-f="fin">财经 4</button><button data-f="tech">科技 3</button>
+</div>
+
+<div class="wrap">
+
+    <details class="item" data-cat="policy" open>
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">01</span>工业和信息化部关于印发《加快构建工业和信息化领域碳排放双控工作体系实施方案（2026—2030年）》的通知</h2>
+        <div class="lead">明确工业和信息化领域碳排放双控目标，推动绿色低碳转型。</div>
+        <div class="meta"><em>部委文件</em> <span>10月21日</span> <span class="dno">工信部节函〔2026〕343号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>建立地方碳考核、行业碳管控、企业碳管理、项目碳评价、产品碳足迹等政策制度。</li><li>到2030年，重点工业产品碳足迹核算规则标准400项左右，建设零碳工厂和零碳算力设施500个左右。</li><li>规模以上工业单位增加值二氧化碳排放比2025年降低17%以上，单位增加值能耗下降10%以上。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>工信部节函〔2026〕343号</li><li>2026年09月30日</li><li>到2030年</li></ul></div>
+        
+        
+        <div class="atts">附件：<a href="https://www.gov.cn/zhengce/zhengceku/202610/P020261021742407240853.pdf" target="_blank" rel="noopener">《加快构建工业和信息化领域碳排放双控工作体系实施方案（2026—2030年）》</a></div>
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083953.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" open>
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">02</span>商务部等9部门关于加快推进科技兴商的意见</h2>
+        <div class="lead">意见强调以科技创新引领商贸发展，推动智能化、绿色化、融合化升级。</div>
+        <div class="meta"><em>部委文件</em> <span>10月19日</span> <span class="dno">商建函〔2026〕551号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>推动商品供给迭代升级，丰富智能商品供给。</li><li>促进商品消费供需匹配，发展柔性制造和个性化定制。</li><li>激发商品消费市场活力，搭建科技成果展示交易平台。</li><li>提升基本需求类服务水平，创新家政、餐饮、医疗健康服务。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>意见提出推动商贸全链条智能化、绿色化、融合化发展。</li><li>意见强调培育一批具有行业影响力的定制品牌。</li><li>意见要求推动智能消费设施和服务向县域延伸。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083721.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" open>
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">03</span>关于印发《综合交通枢纽发展“十五五”规划》的通知</h2>
+        <div class="lead">规划明确‘十五五’时期综合交通枢纽发展目标，推动现代化综合交通运输体系建设。</div>
+        <div class="meta"><em>部委文件</em> <span>10月23日</span> <span class="dno">交规划发〔2026〕118号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>规划强调提升国内外、干支线、跨方式衔接转换效率，统筹推进综合交通枢纽集群、城市、港站建设。</li><li>到2030年，现代化综合交通枢纽体系加快完善，京津冀等地区将打造全国性综合交通枢纽集群。</li><li>规划提出到2035年，基本建成一体融合、便捷顺畅、经济高效、开放互联的现代化综合交通枢纽体系。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>到2030年，全国性综合交通枢纽城市率先实现‘全国123出行交通圈’和‘全球123快货物流圈’。</li><li>京津冀、长三角、粤港澳大湾区等地区将建设全球性国际邮政快递枢纽集群。</li><li>重点提升武汉、长沙、南昌等区域航空枢纽和鄂州专业性航空货运枢纽功能。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7084174.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">04</span>工业和信息化部等八部门关于印发《产业基础能力提升“十五五”规划》的通知</h2>
+        <div class="lead">规划提出到2030年产业基础能力总体进入国际先进行列，实现产业基础全面升级。</div>
+        <div class="meta"><em>部委文件</em> <span>10月22日</span> <span class="dno">工信部联规〔2026〕208号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>到2030年，产业基础薄弱问题明显缓解，技术创新能力、自主可控能力、优质产品供给能力全面提升。</li><li>重点任务包括提升产业基础自主可控能力、增强产业基础创新能力、完善产业技术基础体系等。</li><li>强化标准制定实施，推动计量检测认证认可一体化发展，加快制造业中试平台建设。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>到2030年，产业基础能力总体进入国际先进行列。</li><li>实施关键基础产品攻关行动，围绕跨产业链、跨领域共性基础产品。</li></ul></div>
+        
+        
+        <div class="atts">附件：<a href="https://www.gov.cn/zhengce/zhengceku/202610/P020261022545646318917.pdf" target="_blank" rel="noopener">产业基础能力提升“十五五”规划</a></div>
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7084022.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">05</span>住房城乡建设部关于印发《历史文化名城（镇、村）与历史建筑保护传承“十五五”规划》的通知</h2>
+        <div class="lead">规划强调历史文化名城、街区、村镇整体保护和活态传承，提升保护传承工作水平。</div>
+        <div class="meta"><em>部委文件</em> <span>10月20日</span> <span class="dno">建科〔2026〕60号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>规划旨在提升历史文化名城、街区、村镇整体保护和活态传承水平。</li><li>规划提出到2030年，保护对象数量持续增长，有效利用水平大幅提升。</li><li>规划强调完善历史文化保护传承体系，实现保护名录空间全覆盖、要素全囊括。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>全国共有国家历史文化名城143座、中国历史文化名镇名村799个。</li><li>规划提出到2030年，历史建筑测绘建档率需达到90%以上。</li><li>规划强调到2035年，保护名录实现空间全覆盖、要素全囊括。</li></ul></div>
+        
+        
+        <div class="atts">附件：<a href="https://www.gov.cn/zhengce/zhengceku/202610/P020261020791546390447.pdf" target="_blank" rel="noopener">历史文化名城（镇、村）与历史建筑保护传承“十五五”规划.pdf</a></div>
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083855.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">06</span>市场监管总局等七部门关于印发《广告产业发展“十五五”规划》的通知</h2>
+        <div class="lead">《广告产业发展“十五五”规划》发布，聚焦创新驱动、融合赋能，推动产业转型升级。</div>
+        <div class="meta"><em>部委文件</em> <span>10月20日</span> <span class="dno">国市监广发〔2026〕120号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>规划提出到2030年，广告产业规模年均增长10%左右。</li><li>推动数智广告健康发展，鼓励研发智能体和轻量化大模型工具。</li><li>培育具有国际竞争力的行业领军企业，支持本土头部广告企业做大做强。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>国市监广发〔2026〕120号</li><li>到2030年，广告产业规模年均增长10%左右</li><li>培育10家左右具有国际竞争力的广告领军企业</li></ul></div>
+        
+        
+        <div class="atts">附件：<a href="https://www.gov.cn/zhengce/zhengceku/202610/P020261020719549784650.pdf" target="_blank" rel="noopener">广告产业发展”十五五“规划.pdf</a></div>
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083838.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">07</span>事业单位登记管理条例</h2>
+        <div class="lead">强化事业单位党的领导，规范登记管理，保障合法权益。</div>
+        <div class="meta"><em>国务院文件</em> <span>昨天</span> <span class="dno">国令第849号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>条例自2026年12月1日起施行，旨在加强事业单位党的领导和公益性职责。</li><li>明确事业单位登记管理原则和登记事项，规范法人资格取得与变更。</li><li>强化监督管理，对违规行为进行查处，提升事业单位诚信自律水平。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>自2026年12月1日起施行。</li><li>事业单位登记管理机关负责全国登记管理工作。</li><li>法人证书有效期限届满前90日内应提出换领申请。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7084280.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">08</span>国务院办公厅关于适应人工智能技术发展助力构建就业友好型发展方式的意见</h2>
+        <div class="lead">意见旨在通过人工智能技术构建就业友好型发展方式，减缓就业替代影响。</div>
+        <div class="meta"><em>国务院文件</em> <span>10月23日</span> <span class="dno">国办发〔2026〕29号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>拓展人工智能新兴领域就业空间，培育中小微企业稳岗扩岗新动能。</li><li>创造人工智能领域就业创业新模式，加快开发新职业和发布新职业标准。</li><li>挖掘传统领域人工智能就业潜能，减缓人工智能应用就业替代影响。</li><li>建立人工智能应用就业风险评估机制，协同培养人工智能创新型人才。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>国办发〔2026〕29号</li><li>实施人工智能中小企业创业支持计划</li><li>鼓励地方增设相关职称评审专业</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7084108.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">09</span>国家知识产权局 海关总署关于强化知识产权协同保护的意见</h2>
+        <div class="lead">深化知识产权管理部门与海关合作，构建全链条保护格局。</div>
+        <div class="meta"><em>部委文件</em> <span>10月21日</span> <span class="dno">国知发保字〔2026〕30号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>建立数据共享应用合作长效机制，定期提供商标、专利等基础数据。</li><li>知识产权管理部门与海关协助调查侵权案件，提供专业技术支持。</li><li>强化重点领域保护，鼓励企业向海关申请知识产权备案。</li><li>加强人才培养和宣传，提升知识产权保护意识。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>国知发保字〔2026〕30号</li><li>《知识产权强国建设纲要（2021—2035年）》</li><li>《知识产权保护和运用“十五五”规划》</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083901.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">10</span>关于做好专业学位研究生以实践成果申请学位工作的意见</h2>
+        <div class="lead">专业学位研究生可实践成果申请学位，深化教育评价改革。</div>
+        <div class="meta"><em>部委文件</em> <span>10月19日</span> <span class="dno">学位办〔2026〕26号</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>实践成果成为学位授予重要依据，强化实践育人导向。</li><li>分类分步推进，总结工程类专业学位试点经验。</li><li>教指委发布《基本要求》，指导学位授予单位完善制度。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>学位办〔2026〕26号</li><li>《中华人民共和国学位法》</li><li>2026年9月14日</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.gov.cn/zhengce/zhengceku/202610/content_7083699.htm" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="fin" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-fin">财经</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">11</span>日本央行核心通胀指标突破3%，本周按兵不动但12月加息窗口几成定局？</h2>
+        <div class="lead">日本央行核心通胀指标突破3%，12月加息预期升温。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>6 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>日本央行核心通胀指标9月升至3.2%，创三年新高。</li><li>市场普遍预计日本央行12月将加息，无人预计本周行动。</li><li>服务价格加速增加政策压力，12月会议成关键节点。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>日本央行核心通胀指标9月升至3.2%，创三年新高。</li><li>超过80%的经济学家预计日本央行将在12月上调基准利率。</li><li>日本央行9月已将借贷成本上调至1.25%。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784558" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="fin" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-fin">财经</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">12</span>广东出台深化金融支持现代化农业产业高质量发展举措十三条</h2>
+        <div class="lead">广东金融局联合多部门发布方案，力推涉农贷款突破3万亿。</div>
+        <div class="meta"><em>中新网·财经</em> <span>46 分钟前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>明确13项政策措施，构建一体化农业金融服务机制。</li><li>目标“十五五”期间涉农贷款余额超3万亿，普惠型涉农贷款8000亿元。</li><li>支持农业龙头企业和新型农业经营主体，拓展线上线下服务渠道。</li><li>探索农户家庭资产负债表融资模式，破解轻资产主体融资难题。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>力争“十五五”期间广东辖内涉农贷款余额突破3万亿元</li><li>方案力争“十五五”期间广东辖内普惠型涉农贷款余额达8000亿元</li><li>新型农业经营主体贷款余额达2000亿元</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.chinanews.com.cn/cj/2026/10-27/10721898.shtml" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="policy" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-policy">时政</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">13</span>2026年9月全国查处违反中央八项规定精神问题32940起</h2>
+        <div class="lead">9月全国查处违反中央八项规定精神问题超3.2万起，乡科级以下干部问题占94.1%</div>
+        <div class="meta"><em>中新网·国内</em> <span>4 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>9月全国查处违反中央八项规定精神问题32940起，批评教育和处理40122人。</li><li>乡科级及以下干部问题占查处问题总数的94.1%，地厅级和县处级领导干部问题相对较少。</li><li>查处问题类型中，履职尽责问题占比最高，享乐主义、奢靡之风问题中违规收送名贵特产和礼品礼金问题最多。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>32940起</li><li>94.1%</li><li>14475起</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://www.chinanews.com.cn/gn/2026/10-27/10721751.shtml" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="tech" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-tech">科技</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">14</span>英伟达拟投资30亿美元入股Meta，双方深化AI助手Muse合作</h2>
+        <div class="lead">英伟达投资30亿美元入股Meta，深化AI助手Muse合作，推动AI智能体普及。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>6 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>英伟达计划投资30亿美元入股Meta，深化AI助手Muse合作。</li><li>双方将扩大英伟达下一代计算基础设施的部署，优化Muse大模型性能。</li><li>合作旨在普及个人超级智能，影响全球AI应用生态及底层算力市场。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>30亿美元</li><li>下一代AI智能体</li><li>数十亿用户</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784554" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="fin" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-fin">财经</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">15</span>美国9月耐用品订单创五个月最大增幅，AI投资支撑企业设备需求</h2>
+        <div class="lead">美国9月耐用品订单环比增长1.8%，AI投资推动企业设备需求增长。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>1 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>美国9月耐用品订单环比增长1.8%，创五个月最大增幅。</li><li>商用飞机订单环比大增28.4%，计算机、机械设备和机动车订单均上升。</li><li>人工智能相关支出带动企业设备投资，为第三季度经济增长提供支撑。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>9月耐用品订单环比增长1.8%，高于前值0.1%。</li><li>商用飞机订单环比增长28.4%。</li><li>企业设备支出预计将为第三季度经济增长贡献1个百分点。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784587" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="fin" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-fin">财经</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">16</span>25.83万亿元，私募基金规模又创历史新高！</h2>
+        <div class="lead">私募基金规模再创新高，证券类私募成增长主力。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>3 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>私募基金管理规模达25.83万亿元，创历史新高。</li><li>证券类私募管理规模逆势增长，成为行业增长主要动力。</li><li>优势地区私募基金资源集聚，上海、北京领跑全国。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>25.83万亿元</li><li>7172家</li><li>72.37%</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784578" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="tech" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-tech">科技</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">17</span>瑞芯微三季度净利增长90%，端侧AI新品进入量产</h2>
+        <div class="lead">瑞芯微三季度净利润大幅增长，端侧AI新品量产推动业绩提升。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>5 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>瑞芯微第三季度营业收入15.73亿元，同比增长43.57%，净利润4.73亿元，同比增长90.49%。</li><li>公司前三季度营收44.49亿元，同比增长41.64%，净利润13.32亿元，同比增长70.90%。</li><li>端侧AI新品RK182X等已进入量产，RK3572等产品第三季度量产，预计第四季度成为新增收入来源。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>营业收入15.73亿元，同比增长43.57%；净利润4.73亿元，同比增长90.49%。</li><li>毛利率提升约4.59个百分点，净利率约30.09%。</li><li>RK182X导入数十个行业、数百个客户项目，车载AI Box获得数个项目定点。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784568" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+    <details class="item" data-cat="tech" >
+      <summary>
+        <div class="r1">
+          <span class="cat c-tech">科技</span>
+          
+          <span class="score">0</span>
+        </div>
+        <h2><span class="no">18</span>英伟达被曝内存大调整：Rubin Ultra转向8层HBM4、GPU带宽同步砍13%</h2>
+        <div class="lead">英伟达下一代AI加速器内存架构调整，转向8层HBM4，带宽同步降低13%。</div>
+        <div class="meta"><em>华尔街见闻</em> <span>5 小时前</span></div>
+        <div class="expand">展开要点</div>
+      </summary>
+      <div class="body">
+        <div class="digest"><div class="dh">要点</div><ul><li>英伟达Rubin Ultra转向8层HBM4，带宽降低13%，应对供应链压力。</li><li>12层HBM4方案调整为8层HBM4与HBM4E混合方案，降低成本。</li><li>带宽规格调整，合格供应商范围扩大，HBM4产品通过认证门槛降低。</li></ul></div>
+        
+        <div class="facts"><div class="fh">可引用的事实</div><ul><li>带宽降低13%，原定带宽为22 TB/s。</li><li>HBM4堆叠带宽约为3.0 TB/s（三星、SK海力士）和逾2.8 TB/s（美光）。</li></ul></div>
+        
+        
+        
+        <a class="origin" href="https://wallstreetcn.com/articles/3784566" target="_blank" rel="noopener">阅读原文 ↗</a>
+      </div>
+    </details>
+</div>
+
+<footer>
+  本期抓取 <b>218</b> 条 → 去重后 <b>212</b> 个事件 → 精选 <b>18</b> 条<br>
+  来源：国务院文件、部委文件、国家发展改革委、界面新闻、中新网·要闻、中新网·国内、华尔街见闻、中新网·财经、钛媒体、InfoQ 中文、极客公园、爱范儿、Solidot、少数派、阮一峰的网络日志<br>
+  生成时间 2026-10-27 22:19 · 模型 glm-4-flash · 消耗 47121 tokens · 用时 334.2s
+</footer>
+
+<script>
+document.querySelectorAll('.filters button').forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var f = b.dataset.f;
+    document.querySelectorAll('.item').forEach(function(el){
+      el.style.display = (f === 'all' || el.dataset.cat === f) ? '' : 'none';
+    });
+  };
+});
+</script>
+</body>
+</html>
