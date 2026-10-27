@@ -1,0 +1,92 @@
+name: 静水 · 构建 APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - ".github/workflows/build_apk.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-build
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # 不锁版本：让 create 生成的工程骨架与本机 Flutter 版本一致，避免不兼容
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 环境版本
+        run: flutter --version
+
+      # 仓库里只放 pubspec.yaml 和 lib/，安卓工程由 create 现场生成
+      - name: 生成安卓工程骨架
+        working-directory: app
+        run: flutter create . --project-name jingshui --org com.chenlyn --platforms android
+
+      # 保险：万一 create 覆盖了我们的源码，用 git 恢复
+      - name: 恢复自有源码
+        run: git checkout -- app/pubspec.yaml app/lib/main.dart 2>/dev/null || true
+
+      - name: 安装依赖
+        working-directory: app
+        run: flutter pub get
+
+      # Flutter 模板的 release manifest 默认不带联网权限，必须注入
+      - name: 注入 INTERNET 权限
+        run: |
+          python3 - <<'EOF'
+          import pathlib
+          p = pathlib.Path("app/android/app/src/main/AndroidManifest.xml")
+          s = p.read_text(encoding="utf-8")
+          if "android.permission.INTERNET" not in s:
+              s = s.replace(
+                  "<application",
+                  '<uses-permission android:name="android.permission.INTERNET"/>\n    <application',
+                  1,
+              )
+              p.write_text(s, encoding="utf-8")
+              print("已注入 INTERNET 权限")
+          else:
+              print("权限已存在")
+          EOF
+
+      - name: 构建 APK
+        working-directory: app
+        run: flutter build apk --release
+
+      # APK 放进 output/ 并提交，这样手机能直接从 github.io 下载
+      # （Actions 的 artifact 要登录 github.com 才能取，而 github.com 打不开）
+      - name: 归档 APK
+        run: |
+          mkdir -p output/app
+          cp app/build/app/outputs/flutter-apk/app-release.apk output/app/jingshui.apk
+          ls -la output/app
+
+      - name: 提交 APK
+        run: |
+          git config user.name  "jingshui-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add output/app/
+          if git diff --staged --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "apk: $(date -u -d '+8 hour' '+%Y-%m-%d %H:%M') 构建"
+            git push
+          fi
