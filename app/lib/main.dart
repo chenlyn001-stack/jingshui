@@ -713,7 +713,7 @@ class DetailView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: InkWell(
                   onTap: a.url.isEmpty ? null : () => onOpen(a.url),
-                  child: Text('📎 ${a.name}',
+                  child: Text('📎 ${a.source}',
                       style: const TextStyle(
                           fontSize: 13,
                           color: Color(0xFF3B6EA5),
