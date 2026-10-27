@@ -69,14 +69,15 @@ jobs:
 
       - name: 构建 APK
         working-directory: app
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
 
+      # 只取 arm64（2016 年后的手机全是它），44MB 的通用包能砍到 20MB 左右
       # APK 放进 output/ 并提交，这样手机能直接从 github.io 下载
       # （Actions 的 artifact 要登录 github.com 才能取，而 github.com 打不开）
       - name: 归档 APK
         run: |
           mkdir -p output/app
-          cp app/build/app/outputs/flutter-apk/app-release.apk output/app/jingshui.apk
+          cp app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output/app/jingshui.apk
           ls -la output/app
 
       - name: 提交 APK
