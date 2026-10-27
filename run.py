@@ -24,6 +24,12 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 
+# 云端（GitHub Actions）容器默认是 UTC，会让 06:30 那次被标成"前一天"。
+# 这里强制切到北京时间，本地跑也不受影响。
+os.environ.setdefault("TZ", "Asia/Shanghai")
+if hasattr(time, "tzset"):
+    time.tzset()
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 from engine import ai, build, fetch, nlp  # noqa: E402
