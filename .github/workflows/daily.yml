@@ -20,6 +20,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      TZ: Asia/Shanghai
 
     steps:
       - uses: actions/checkout@v4
