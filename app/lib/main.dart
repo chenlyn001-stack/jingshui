@@ -4,9 +4,36 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
-/// 简报数据地址（GitHub Pages，国内可直连）
-const String kDataUrl =
-    'https://chenlyn001-stack.github.io/jingshui/output/today.json';
+/// 同一份数据有多条线路，按优先级逐个试，哪条通就用哪条。
+///
+/// 为什么要这样：github.io 在国内时通时断（实测连续 5 次有 3 次失败），
+/// 只写一个地址就会出现"取不到简报"。api.github.com 稳定但要解 base64；
+/// jsDelivr 三条线通常可直连，但可能缓存最多 12 小时，所以排在最后。
+const String kAppVersion = '0.1.1';
+
+class Endpoint {
+  const Endpoint(this.label, this.url, this.asGithubApi);
+  final String label;
+  final String url;
+  final bool asGithubApi;
+}
+
+const List<Endpoint> kEndpoints = [
+  Endpoint('github.io',
+      'https://chenlyn001-stack.github.io/jingshui/output/today.json', false),
+  Endpoint('api.github.com',
+      'https://api.github.com/repos/chenlyn001-stack/jingshui/contents/output/today.json',
+      true),
+  Endpoint('jsDelivr',
+      'https://cdn.jsdelivr.net/gh/chenlyn001-stack/jingshui@main/output/today.json',
+      false),
+  Endpoint('jsDelivr-fastly',
+      'https://fastly.jsdelivr.net/gh/chenlyn001-stack/jingshui@main/output/today.json',
+      false),
+  Endpoint('jsDelivr-gcore',
+      'https://gcore.jsdelivr.net/gh/chenlyn001-stack/jingshui@main/output/today.json',
+      false),
+];
 
 void main() => runApp(const JingshuiApp());
 
@@ -187,15 +214,61 @@ class CompareBlock {
   }
 }
 
-Future<Briefing> loadBriefing() async {
-  final res =
-      await http.get(Uri.parse(kDataUrl)).timeout(const Duration(seconds: 30));
-  if (res.statusCode != 200) {
-    throw Exception('服务器返回 ${res.statusCode}');
+String _short(Object e) {
+  var s = e.toString().replaceAll('\n', ' ');
+  if (s.length > 70) s = '${s.substring(0, 70)}…';
+  return s;
+}
+
+class LoadResult {
+  LoadResult(this.briefing, this.source, this.tried);
+  final Briefing briefing;
+  final String source;
+  final List<String> tried;
+}
+
+/// 逐条线路试，每条最多 9 秒；全部失败就重来一轮（github.io 断一下自己会好）
+Future<LoadResult> loadBriefing() async {
+  final tried = <String>[];
+  final stamp = DateTime.now().millisecondsSinceEpoch ~/ 3600000; // 每小时变一次，用于破缓存
+  for (var round = 0; round < 2; round++) {
+    for (final ep in kEndpoints) {
+      final url = ep.asGithubApi ? ep.url : '${ep.url}?t=$stamp';
+      try {
+        final res = await http.get(
+          Uri.parse(url),
+          headers: const {'Accept': 'application/vnd.github+json'},
+        ).timeout(const Duration(seconds: 9));
+
+        if (res.statusCode != 200) {
+          tried.add('${ep.label}  HTTP ${res.statusCode}');
+          continue;
+        }
+        String text;
+        if (ep.asGithubApi) {
+          final obj = jsonDecode(utf8.decode(res.bodyBytes));
+          if (obj is! Map) throw Exception('接口返回格式不对');
+          final b64 = (obj['content'] ?? '').toString().replaceAll('\n', '');
+          if (b64.isEmpty) throw Exception('接口没有内容');
+          text = utf8.decode(base64Decode(b64));
+        } else {
+          text = utf8.decode(res.bodyBytes);
+        }
+
+        final decoded = jsonDecode(text);
+        if (decoded is! Map) throw Exception('数据格式不对');
+        final br = Briefing.fromMap(Map<String, dynamic>.from(decoded));
+        if (br.items.isEmpty) throw Exception('今天没有条目');
+        return LoadResult(br, ep.label, tried);
+      } catch (e) {
+        tried.add('${ep.label}  ${_short(e)}');
+      }
+    }
+    if (round == 0) {
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+    }
   }
-  final decoded = jsonDecode(utf8.decode(res.bodyBytes));
-  if (decoded is! Map) throw Exception('数据格式不对');
-  return Briefing.fromMap(Map<String, dynamic>.from(decoded));
+  throw Exception('五条线路都试过了，都没通。\n\n${tried.join('\n')}');
 }
 
 Future<void> openUrl(BuildContext context, String url) async {
@@ -231,6 +304,7 @@ class HomePage extends StatefulWidget {
 class _HomeState extends State<HomePage> {
   Briefing? _data;
   String? _error;
+  String _source = '';
   bool _loading = true;
   int _selected = 0;
 
@@ -241,24 +315,39 @@ class _HomeState extends State<HomePage> {
   }
 
   Future<void> _refresh() async {
+    final hadData = _data != null;
     setState(() {
-      _loading = true;
+      if (!hadData) _loading = true;
       _error = null;
     });
     try {
-      final d = await loadBriefing();
+      final r = await loadBriefing();
       if (!mounted) return;
       setState(() {
-        _data = d;
+        _data = r.briefing;
+        _source = r.source;
         _loading = false;
-        if (_selected >= d.items.length) _selected = 0;
+        if (_selected >= r.briefing.items.length) _selected = 0;
       });
+      if (hadData) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('已更新（${r.source}）')),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _loading = false;
-      });
+      if (!hadData) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      } else {
+        // 已有内容时刷新失败，不要把内容换成一页报错
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('刷新失败，仍在显示上一次的内容')),
+        );
+      }
     }
   }
 
@@ -295,19 +384,43 @@ class _HomeState extends State<HomePage> {
       );
     }
     if (_error != null || _data == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.cloud_off, size: 44),
-            const SizedBox(height: 12),
-            const Text('取不到简报，检查一下网络'),
-            const SizedBox(height: 6),
-            Text(_error ?? '', style: const TextStyle(fontSize: 11)),
-            const SizedBox(height: 14),
-            FilledButton.tonal(onPressed: _refresh, child: const Text('重试')),
-          ],
-        ),
+      final hint = Theme.of(context).hintColor;
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(20, 36, 20, 40),
+        children: [
+          Icon(Icons.cloud_off, size: 44, color: hint),
+          const SizedBox(height: 14),
+          const Center(
+            child: Text('取不到简报',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(height: 6),
+          Center(
+            child: Text('版本 $kAppVersion · 已试过 ${kEndpoints.length} 条线路',
+                style: TextStyle(fontSize: 12, color: hint)),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: dark ? const Color(0xFF20242B) : const Color(0xFFF5F1E8),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SelectableText(
+              _error ?? '（没有拿到错误信息）',
+              style: const TextStyle(fontSize: 12.5, height: 1.65),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text('长按上面这段可全选复制，发给我就能定位是哪条线路被墙了。',
+              style: TextStyle(fontSize: 12, color: hint)),
+          const SizedBox(height: 18),
+          Center(
+            child: FilledButton.tonal(
+                onPressed: _refresh, child: const Text('重试')),
+          ),
+        ],
       );
     }
     final d = _data!;
@@ -321,7 +434,7 @@ class _HomeState extends State<HomePage> {
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
               children: [
-                BriefHeader(d: d, dark: dark),
+                BriefHeader(d: d, dark: dark, source: _source),
                 const SizedBox(height: 6),
                 for (final it in d.items)
                   ItemTile(
@@ -340,7 +453,7 @@ class _HomeState extends State<HomePage> {
           }
           if (d.items.isEmpty) {
             return ListView(children: [
-              BriefHeader(d: d, dark: dark),
+              BriefHeader(d: d, dark: dark, source: _source),
               const Padding(padding: EdgeInsets.all(40), child: Text('今天没有精选内容')),
             ]);
           }
@@ -354,7 +467,7 @@ class _HomeState extends State<HomePage> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(12, 8, 8, 24),
                   children: [
-                    BriefHeader(d: d, dark: dark),
+                    BriefHeader(d: d, dark: dark, source: _source),
                     const SizedBox(height: 6),
                     for (var i = 0; i < d.items.length; i++)
                       ItemTile(
@@ -387,10 +500,16 @@ class _HomeState extends State<HomePage> {
 // ---------------------------------------------------------------------------
 
 class BriefHeader extends StatelessWidget {
-  const BriefHeader({super.key, required this.d, required this.dark});
+  const BriefHeader({
+    super.key,
+    required this.d,
+    required this.dark,
+    required this.source,
+  });
 
   final Briefing d;
   final bool dark;
+  final String source;
 
   @override
   Widget build(BuildContext context) {
@@ -442,6 +561,12 @@ class BriefHeader extends StatelessWidget {
             '抓取 ${d.rawCount} · 去重 ${d.uniqCount} · 精选 ${d.items.length} · ${d.sourceCount} 个源',
             style: TextStyle(
                 fontSize: 11.5, color: Theme.of(context).hintColor),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            'v$kAppVersion · 数据来自 ${source.isEmpty ? "—" : source}',
+            style: TextStyle(
+                fontSize: 10.5, color: Theme.of(context).hintColor),
           ),
         ],
       ),
